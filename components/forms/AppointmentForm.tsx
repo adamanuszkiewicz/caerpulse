@@ -15,32 +15,38 @@ import { FormFieldType } from "./PatientForm"
 import Image from "next/image"
 import { SelectItem } from "../ui/select"
 import { Doctors } from "@/constants"
-import { createAppointment } from "@/lib/actions/appointment.actions"
+import { createAppointment, updateAppointment } from "@/lib/actions/appointment.actions"
+import { Appointment } from "@/types/appwrite.types"
 
 const AppointmentForm = ({
-  userId, patientId, type
+  userId, patientId, type, appointment, setOpen
 }: {
   userId: string,
   patientId: string,
   type: "create" | "cancel" | "schedule";
+  appointment?: Appointment;
+  setOpen: (open: boolean) => void;
 }) => {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false)
 
   const AppointmentFormValidation = getAppointmentSchema(type);
 
+ 
   const form = useForm<z.infer<typeof AppointmentFormValidation>>({
     resolver: zodResolver(AppointmentFormValidation),
     defaultValues: {
-      primaryPhysician: "",
-      schedule: new Date(),
-      reason: "",
-      note: "",
-      cancellationReason: "",
+      primaryPhysician: appointment ? appointment.primaryPhysician : '',
+      schedule: appointment ? new Date(appointment?.schedule) : new Date(Date.now()),
+      reason: appointment ? appointment.reason : '',
+      note: appointment?.note || '',
+      cancellationReason: appointment?.cancellationReason || '',
     },
   })
- 
+  
   async function onSubmit(values: z.infer<typeof AppointmentFormValidation>) {
+    console.log('Im submiting' , {type})
+
     setIsLoading(true);
 
     let status;
@@ -49,16 +55,15 @@ const AppointmentForm = ({
         status = 'scheduled';
         break;
       case 'cancel':
-        status = 'canceled';
+        status = 'cancelled';
+        break;
       default:
         status = 'pending';
-        break;
+        break; 
     }
-
+    console.log({type})
     try {
       if(type === 'create' && patientId) {
-        console.log('IM HERE')
-
         const appointmentData = {
           userId,
           patient: patientId,
@@ -68,17 +73,34 @@ const AppointmentForm = ({
           note: values.note,
           status: status as Status,
         }
-        const appointment = await createAppointment(appointmentData);
 
-        console.log(appointment)
+        const appointment = await createAppointment(appointmentData);
 
         if (appointment) {
           form.reset();
           router.push(`/patients/${userId}/new-appointment/success?appointmentId=${appointment.$id}`)
         }
-      }
+      } else {
+        console.log('Updating appointment')
+        const appointmentToUpdate = {
+          userId,
+          appointmentId: appointment?.$id!,
+          appointment: {
+            primaryPhysician: values?.primaryPhysician,
+            schedule: new Date(values?.schedule),
+            status: status as Status,
+            cancellationReason: values?.cancellationReason,
+          },
+          type
+        }
 
-      
+        const updatedAppointment = await updateAppointment(appointmentToUpdate);
+
+        if (updatedAppointment) {
+          setOpen && setOpen(false);
+          form.reset();
+        }
+      }
     } catch (error) {
       console.log(error);
     }
@@ -102,15 +124,13 @@ const AppointmentForm = ({
       break;
   }
 
-  console.log('BEFORE THE TYPE', type)
-
   return (
     <Form {...form}>
     <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 flex-1">
-      <section className="mb-12 space-y-4">
+      {type === 'create' && <section className="mb-12 space-y-4">
         <h1 className="header">New Appointment</h1>
         <p className="text-dark-700">Request a new appointment in 10 seconds.</p>
-      </section>
+      </section>}
       
       {type !== "cancel" && (
         <>
@@ -122,8 +142,8 @@ const AppointmentForm = ({
             label="Doctor"
             placeholder="Select a doctor"
           >
-            {Doctors.map((doctor, i) => (
-              <SelectItem key={doctor.name + i} value={doctor.name}>
+            {Doctors.map((doctor) => (
+              <SelectItem key={doctor.name} value={doctor.name}>
                 <div className="flex cursor-pointer items-center gap-2">
                   <Image
                     src={doctor.image}
