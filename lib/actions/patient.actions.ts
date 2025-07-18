@@ -17,8 +17,9 @@ export const createUser = async (user: CreateUserParams) => {
     console.log({newUser})
 
     return parseStringify(newUser)
-  } catch (error: any) {
-    if (error && error?.code === 409) {
+  } catch (error: unknown) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    if (error && (error as any)?.code === 409) {
       const documents = await users.list([
         Query.equal("email", [user.email]),
       ])

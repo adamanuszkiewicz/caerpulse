@@ -2,7 +2,6 @@
 
 import { ColumnDef } from "@tanstack/react-table"
 // import { MoreHorizontal } from "lucide-react"
-import { Button } from "@/components/ui/button"
 import StatusBadge from "../StatusBadge"
 import { formatDateTime } from "@/lib/utils"
 import { Doctors } from "@/constants"
@@ -24,7 +23,7 @@ export const columns: ColumnDef<Appointment>[] = [
   {
     accessorKey: "status",
     header: "Status",
-    cell: ({ row }) => {const appointment = row.original;
+    cell: ({ row }) => {
       return (
       <div className="min-w-[115px]">
         <StatusBadge status={row.original.status} />
@@ -35,7 +34,6 @@ export const columns: ColumnDef<Appointment>[] = [
     accessorKey: "schedule",
     header: "Appointment",
     cell: ({ row }) => {
-      const appointment = row.original;
       return (
       <p className="text-14-regular min-w-[100px]">
         {formatDateTime(row.original.schedule).dateTime}
@@ -50,8 +48,8 @@ export const columns: ColumnDef<Appointment>[] = [
 
       return (
         <div className="flex items-center gap-3">
-          <Image src={doctor?.image}
-            alt={doctor?.name}
+          <Image src={doctor?.image || '/assets/icons/user.svg'}
+            alt={doctor?.name || 'Doctor'}
             width={100}
             height={100}
             className="size-8"

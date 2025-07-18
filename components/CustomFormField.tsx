@@ -3,7 +3,6 @@
 import React from 'react'
 import {
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -24,6 +23,7 @@ import { Checkbox } from './ui/checkbox'
 import { Label } from './ui/label'
 
 interface CustomProps {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   control: Control<any>,
   fieldType: FormFieldType,
   name: string,
@@ -35,9 +35,11 @@ interface CustomProps {
   dateFormat?: string,
   showTimeSelect?: boolean,
   children?: React.ReactNode,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   renderSkeleton?: (field: any) => React.ReactNode,
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const RenderField = ({ field, props}: { field: any; props: CustomProps }) => {
   const { fieldType, iconSrc, iconAlt, placeholder, showTimeSelect, dateFormat, renderSkeleton } = props;
 
