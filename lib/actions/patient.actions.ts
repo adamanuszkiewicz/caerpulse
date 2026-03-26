@@ -26,6 +26,7 @@ export const createUser = async (user: CreateUserParams) => {
 
       return documents?.users[0]
     }
+    throw error;
   }
 };
 

@@ -10,6 +10,7 @@ import { useState } from "react"
 import { UserFormValidation } from "@/lib/validation"
 import { useRouter } from "next/navigation"
 import { createUser } from "@/lib/actions/patient.actions"
+import { toast } from 'sonner'
 
 export enum FormFieldType {
   INPUT ='input',
@@ -43,8 +44,10 @@ const PatientForm = () => {
       const user = await createUser(userData);
 
       if(user) router.push(`/patients/${user.$id}/register`)
-    } catch (error) {
+      else toast.error('Something went wrong. Please try again.')
+    } catch (error: any) {
       console.log(error);
+      toast.error(error?.message || 'Something went wrong. Please try again.')
     }
 
     setIsLoading(false);
