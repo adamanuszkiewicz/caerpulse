@@ -7,7 +7,13 @@ import Link from 'next/link'
 import React from 'react'
 
 const Admin = async () => {
-  const appointments = await getRecentAppointmentList()
+  const appointments = (await getRecentAppointmentList()) ?? {
+    totalCount: 0,
+    scheduledCount: 0,
+    pendingCount: 0,
+    cancelledCount: 0,
+    documents: [],
+  }
 
   return (
     <div className="mx-auto flex max-w-7xl flex-col space-y-14">
@@ -51,7 +57,7 @@ const Admin = async () => {
           />
         </section>
 
-        <DataTable columns={columns} data={appointments.documents} />
+        <DataTable columns={columns} data={appointments.documents ?? []} />
       </main>
     </div>
   )

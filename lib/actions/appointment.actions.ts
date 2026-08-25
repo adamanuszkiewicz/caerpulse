@@ -18,7 +18,8 @@ export const createAppointment = async (appointment: CreateAppointmentParams) =>
 
     return parseStringify(newAppointment);
   } catch (error) {
-    console.log(error);
+    console.error('Failed to create appointment:', error);
+    return null;
   }
 } 
 
@@ -32,7 +33,8 @@ export const getAppointment = async (appointmentId: string) => {
 
     return parseStringify(appointment);
   } catch (error) {
-    console.log(error)
+    console.error('Failed to fetch appointment:', error);
+    return null;
   }
 }
 
@@ -68,9 +70,17 @@ export const getRecentAppointmentList = async () => {
     }
 
     return parseStringify(data);
-      
+
   } catch (error) {
-    console.log(error);
+    console.error('Failed to load recent appointments:', error);
+
+    return {
+      totalCount: 0,
+      scheduledCount: 0,
+      pendingCount: 0,
+      cancelledCount: 0,
+      documents: [],
+    };
   }
 }
 

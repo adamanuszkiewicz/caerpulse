@@ -36,7 +36,8 @@ export const getUser = async (userId: string) => {
 
     return parseStringify(user);
   } catch (error) {
-    console.log(error)
+    console.error('Failed to fetch user:', error);
+    return null;
   }
 };
 
@@ -48,9 +49,10 @@ export const getPatient = async (userId: string) => {
       [Query.equal('userId', userId)]
     );
 
-    return parseStringify(patients.documents[0]);
+    return parseStringify(patients.documents[0] ?? null);
   } catch (error) {
-    console.log(error)
+    console.error('Failed to fetch patient:', error);
+    return null;
   }
 };
 
